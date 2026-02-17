@@ -31,7 +31,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const genAI = new GoogleGenerativeAI(apiKey!);
 
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-flash-latest',
+      generationConfig: { maxOutputTokens: 40, temperature: 0.7 },
     });
 
     const prompt = `Tell me the current weather in ${city}. Answer in one short sentence.`;
