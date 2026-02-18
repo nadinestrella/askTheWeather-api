@@ -1,6 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
+export const config = {
+  runtime: 'nodejs',
+  regions: ['fra1'],
+};
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   //Allow CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
