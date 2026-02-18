@@ -38,7 +38,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const prompt = `Tell me the current weather in ${city}. Answer in one short sentence.`;
 
     // const result = await model.generateContent(prompt);
-    console.time('Gemini call');
+    console.time('initializing Gemini');
     const result = await model.generateContent({
       contents: [
         {
@@ -51,7 +51,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         temperature: 0.7,
       },
     });
-    console.timeEnd('Gemini call');
+    console.timeEnd('Gemini call end');
 
     const text = result.response.text();
 
