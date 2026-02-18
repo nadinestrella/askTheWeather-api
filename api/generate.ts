@@ -1,12 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const apiKey = process.env.GEMINI_API_KEY;
-
-if (!apiKey) {
-  throw new Error('GEMINI_API_KEY is not defined');
-}
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   //Allow CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -21,8 +15,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { city } = req.body;
+  // Ensure API key is available
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return res.status(500).json({
+      error: 'Server misconfiguration: API key missing',
+    });
+  }
 
+  const { city } = req.body;
   if (!city) {
     return res.status(400).json({ error: 'City is required' });
   }
@@ -38,7 +39,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const prompt = `Tell me the current weather in ${city}. Answer in one short sentence.`;
 
     // const result = await model.generateContent(prompt);
-    console.time('initializing Gemini');
+    console.time('Gemini call');
     const result = await model.generateContent({
       contents: [
         {
@@ -51,13 +52,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         temperature: 0.7,
       },
     });
-    console.timeEnd('Gemini call end');
+    console.timeEnd('Gemini call');
 
     const text = result.response.text();
+    const cleanText = text?.replace(/\*\*/g, '') || 'No response generated';
 
-    return res.status(200).json({
-      text: text.replace(/\*\*/g, '') || 'No response generated',
-    });
+    return res.status(200).json({ text: cleanText });
   } catch (error: any) {
     return res.status(500).json({
       error: error.message || 'Server error',
